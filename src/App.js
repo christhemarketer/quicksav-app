@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { 
   Home, 
   Layers, 
-  Clock, 
   Share2, 
   User, 
   Settings, 
@@ -451,6 +450,7 @@ function App() {
   // Sidebar navigation
   const Sidebar = () => (
     <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+      {/* Logo */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
           <img 
@@ -467,6 +467,14 @@ function App() {
         </button>
       </div>
       
+      {/* QuickSav NOW Button */}
+      <div className="p-4 border-b border-gray-200">
+        <button className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          QuickSav NOW
+        </button>
+      </div>
+      
+      {/* Main Navigation */}
       <nav className="p-4">
         <div className="space-y-2">
           <button
@@ -490,26 +498,21 @@ function App() {
           </button>
           
           <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
-            <Clock size={20} />
-            <span>QuickSavs</span>
-          </button>
-          
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
-            <Search size={20} />
-            <span>Search</span>
-          </button>
-          
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
             <Share2 size={20} />
             <span>SendIt</span>
           </button>
         </div>
         
+        {/* Account Section */}
         <div className="mt-8">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Account</div>
           <div className="space-y-2">
             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
-              <User size={20} />
+              <img 
+                src="/CtM-Head.jpg" 
+                alt="Profile" 
+                className="w-5 h-5 rounded-full object-cover"
+              />
               <span>Profile</span>
             </button>
             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
