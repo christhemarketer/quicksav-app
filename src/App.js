@@ -265,17 +265,11 @@ function App() {
       {/* Official Logo and Tagline */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
-          <svg width="200" height="60" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 20 C20 20, 10 20, 10 30 L10 35 C10 45, 20 45, 30 45 L65 45 C75 45, 75 55, 75 55 C75 65, 65 65, 65 65 L30 65 C30 65, 30 75, 40 75 L70 75 C80 75, 90 75, 90 85 L90 90 C90 100, 80 100, 70 100 L20 100 C20 100, 20 90, 30 90 L65 90 C75 90, 75 80, 75 80 C75 70, 65 70, 65 70 L30 70 C20 70, 10 70, 10 60 L10 55 C10 45, 20 45, 20 45 L55 45 C65 45, 65 35, 65 35 C65 25, 55 25, 55 25 L20 25 C20 25, 20 20, 20 20 Z" fill="black"/>
-            <ellipse cx="125" cy="60" rx="25" ry="35" fill="black"/>
-            <ellipse cx="125" cy="60" rx="15" ry="25" fill="white"/>
-            <rect x="140" y="45" width="15" height="50" fill="black"/>
-            <path d="M180 45 L195 45 L210 85 L225 45 L240 45 L215 100 L205 100 L180 45 Z" fill="#4A90E2"/>
-            <circle cx="265" cy="35" r="8" fill="black"/>
-            <rect x="257" y="45" width="16" height="50" fill="black"/>
-            <rect x="290" y="25" width="16" height="70" fill="black"/>
-            <rect x="280" y="45" width="36" height="12" fill="black"/>
-          </svg>
+          <img 
+            src="/QuickSavLogoV1.png" 
+            alt="QuickSav Logo" 
+            className="h-16"
+          />
         </div>
         <p className="text-lg text-gray-600 font-medium">Organized Media System</p>
       </div>
@@ -459,10 +453,11 @@ function App() {
     <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">QS</span>
-          </div>
-          <span className="font-bold text-xl text-gray-800">QuickSav</span>
+          <img 
+            src="/QuickSavLogoV1.png" 
+            alt="QuickSav" 
+            className="h-8 object-contain"
+          />
         </div>
         <button
           onClick={() => setIsSidebarOpen(false)}
@@ -566,10 +561,11 @@ function App() {
             <Menu size={20} className="text-gray-600" />
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">QS</span>
-            </div>
-            <span className="font-bold text-xl text-gray-800">QuickSav</span>
+            <img 
+              src="/QuickSavLogoV1.png" 
+              alt="QuickSav" 
+              className="h-8 object-contain"
+            />
           </div>
           <div className="w-10" />
         </div>
