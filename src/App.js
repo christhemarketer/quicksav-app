@@ -29,7 +29,8 @@ import {
   Search,
   ExternalLink,
   File,
-  Calendar
+  Calendar,
+  Clock
 } from 'lucide-react';
 
 // File type detection and icon mapping
@@ -168,6 +169,10 @@ function App() {
   const [selectedSpace, setSelectedSpace] = useState(null);
   const [selectedStack, setSelectedStack] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showQuickSavModal, setShowQuickSavModal] = useState(false);
+  const [quickSavType, setQuickSavType] = useState('link');
 
   // Mock data
   const [spaces, setSpaces] = useState([
@@ -255,8 +260,265 @@ function App() {
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
       metadata: { domain: 'youtube.com' }
+    },
+    {
+      id: 'qs4',
+      title: 'Design System Components.pdf',
+      type: 'link',
+      url: 'https://example.com/design-system.pdf',
+      timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
+      metadata: { domain: 'example.com' }
+    },
+    {
+      id: 'qs5',
+      title: 'Team Photo.jpg',
+      type: 'image',
+      filePath: '/Users/demo/Photos/team-photo.jpg',
+      timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000),
+      metadata: { size: '4.2 MB' }
+    },
+    {
+      id: 'qs6',
+      title: 'Project Planning Guide',
+      type: 'link',
+      url: 'https://notion.so/project-planning',
+      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+      metadata: { domain: 'notion.so' }
+    },
+    {
+      id: 'qs7',
+      title: 'Wireframe Mockups.png',
+      type: 'image',
+      filePath: '/Users/demo/Design/wireframes.png',
+      timestamp: new Date(Date.now() - 1.5 * 24 * 60 * 60 * 1000),
+      metadata: { size: '1.8 MB' }
+    },
+    {
+      id: 'qs8',
+      title: 'API Documentation',
+      type: 'link',
+      url: 'https://docs.api.com/v2',
+      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      metadata: { domain: 'docs.api.com' }
+    },
+    {
+      id: 'qs9',
+      title: 'Financial Report Q3.pdf',
+      type: 'link',
+      url: 'https://company.com/reports/q3.pdf',
+      timestamp: new Date(Date.now() - 2.5 * 24 * 60 * 60 * 1000),
+      metadata: { domain: 'company.com' }
+    },
+    {
+      id: 'qs10',
+      title: 'Marketing Campaign Video.mp4',
+      type: 'video',
+      filePath: '/Users/demo/Videos/campaign.mp4',
+      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      metadata: { size: '15.7 MB' }
     }
   ]);
+
+  // Add new QuickSav function
+  const addQuickSav = (newItem) => {
+    const quickSav = {
+      id: `qs${Date.now()}`,
+      title: newItem.title,
+      type: newItem.type,
+      url: newItem.url || null,
+      filePath: newItem.filePath || null,
+      timestamp: new Date(),
+      metadata: newItem.metadata || {}
+    };
+    setQuickSavs(prev => [quickSav, ...prev]);
+    setShowQuickSavModal(false);
+  };
+
+  // QuickSav NOW Modal
+  const QuickSavModal = () => {
+    const [title, setTitle] = useState('');
+    const [url, setUrl] = useState('');
+    const [description, setDescription] = useState('');
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (!title.trim()) return;
+
+      const newItem = {
+        title: title.trim(),
+        type: quickSavType,
+        url: quickSavType === 'link' ? url : null,
+        filePath: quickSavType === 'file' ? `/Users/demo/${title}` : null,
+        metadata: {
+          description: description,
+          domain: quickSavType === 'link' && url ? new URL(url).hostname : null
+        }
+      };
+
+      addQuickSav(newItem);
+      setTitle('');
+      setUrl('');
+      setDescription('');
+    };
+
+    if (!showQuickSavModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-800">QuickSav NOW</h2>
+              <button
+                onClick={() => setShowQuickSavModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X size={20} className="text-gray-600" />
+              </button>
+            </div>
+            <p className="text-gray-600 mt-2">Quickly save any type of content to organize later</p>
+          </div>
+
+          <div className="p-6">
+            {/* Content Type Selection */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">Content Type</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button
+                  onClick={() => setQuickSavType('link')}
+                  className={`p-4 rounded-lg border-2 transition-colors ${
+                    quickSavType === 'link' 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <ExternalLink size={24} className={`mx-auto mb-2 ${quickSavType === 'link' ? 'text-blue-600' : 'text-gray-400'}`} />
+                  <div className={`text-sm font-medium ${quickSavType === 'link' ? 'text-blue-600' : 'text-gray-600'}`}>Link/URL</div>
+                </button>
+                
+                <button
+                  onClick={() => setQuickSavType('image')}
+                  className={`p-4 rounded-lg border-2 transition-colors ${
+                    quickSavType === 'image' 
+                      ? 'border-purple-500 bg-purple-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Image size={24} className={`mx-auto mb-2 ${quickSavType === 'image' ? 'text-purple-600' : 'text-gray-400'}`} />
+                  <div className={`text-sm font-medium ${quickSavType === 'image' ? 'text-purple-600' : 'text-gray-600'}`}>Image</div>
+                </button>
+
+                <button
+                  onClick={() => setQuickSavType('video')}
+                  className={`p-4 rounded-lg border-2 transition-colors ${
+                    quickSavType === 'video' 
+                      ? 'border-red-500 bg-red-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Video size={24} className={`mx-auto mb-2 ${quickSavType === 'video' ? 'text-red-600' : 'text-gray-400'}`} />
+                  <div className={`text-sm font-medium ${quickSavType === 'video' ? 'text-red-600' : 'text-gray-600'}`}>Video</div>
+                </button>
+
+                <button
+                  onClick={() => setQuickSavType('file')}
+                  className={`p-4 rounded-lg border-2 transition-colors ${
+                    quickSavType === 'file' 
+                      ? 'border-emerald-500 bg-emerald-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <FileText size={24} className={`mx-auto mb-2 ${quickSavType === 'file' ? 'text-emerald-600' : 'text-gray-400'}`} />
+                  <div className={`text-sm font-medium ${quickSavType === 'file' ? 'text-emerald-600' : 'text-gray-600'}`}>Document</div>
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title *
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter a descriptive title..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              {/* URL field for links */}
+              {quickSavType === 'link' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    URL
+                  </label>
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://example.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              )}
+
+              {/* File upload simulation for other types */}
+              {quickSavType !== 'link' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    File
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <Upload size={24} className="mx-auto text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-600">
+                      {quickSavType === 'image' && 'Drop an image here or click to browse'}
+                      {quickSavType === 'video' && 'Drop a video here or click to browse'}
+                      {quickSavType === 'file' && 'Drop a document here or click to browse'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description (Optional)
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Add any notes or context..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowQuickSavModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Save to QuickSav
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Home view with logo, usage modules, and QuickSavs queue
   const HomeView = () => (
@@ -274,38 +536,179 @@ function App() {
       </div>
 
       {/* Usage Modules */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-          <div className="text-3xl font-bold text-blue-600 mb-2">2 of 4</div>
-          <div className="text-gray-600 font-medium">Total Spaces</div>
-          <div className="text-sm text-gray-500 mt-1">Free Tier Limit</div>
+      <div className="grid grid-cols-3 gap-6 mb-6">
+        {/* Spaces Module */}
+        <div className="bg-blue-600 border border-blue-200 rounded-xl p-6 relative overflow-hidden" style={{
+          backgroundImage: `
+            linear-gradient(rgba(59, 130, 246, 0.8), rgba(30, 64, 175, 0.8)),
+            url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=")
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(0px)'
+        }}>
+          <div className="absolute inset-0 bg-blue-600/70 backdrop-blur-sm"></div>
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <Layers size={24} className="text-white" />
+              <h3 className="text-2xl font-bold text-white">Total Spaces</h3>
+            </div>
+            <div className="text-4xl font-bold text-white mb-3">2 <span className="text-lg text-blue-200">used</span></div>
+            
+            {/* Progress Bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-blue-100 mb-1">
+                <span>Progress</span>
+                <span>2/4 (50%)</span>
+              </div>
+              <div className="w-full bg-blue-800/40 rounded-full h-2">
+                <div className="bg-gradient-to-r from-white to-blue-100 h-2 rounded-full transition-all duration-300" style={{width: '50%'}}></div>
+              </div>
+            </div>
+
+            {/* Tier Info */}
+            <div className="flex items-center justify-center">
+              <div className="text-xs">
+                <span className="text-blue-100 font-medium">Current Tier: </span>
+                <span className="bg-white text-blue-600 px-2 py-1 rounded-full text-xs font-medium">Free</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-          <div className="text-3xl font-bold text-blue-600 mb-2">5 of 20</div>
-          <div className="text-gray-600 font-medium">Total Stacks</div>
-          <div className="text-sm text-gray-500 mt-1">Free Tier Limit</div>
+
+        {/* Stacks Module */}
+        <div className="bg-emerald-600 border border-emerald-200 rounded-xl p-6 relative overflow-hidden" style={{
+          backgroundImage: `
+            linear-gradient(rgba(16, 185, 129, 0.8), rgba(4, 120, 87, 0.8)),
+            url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=")
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <div className="absolute inset-0 bg-emerald-600/70 backdrop-blur-sm"></div>
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <Folder size={24} className="text-white" />
+              <h3 className="text-2xl font-bold text-white">Total Stacks</h3>
+            </div>
+            <div className="text-4xl font-bold text-white mb-3">5 <span className="text-lg text-emerald-200">used</span></div>
+            
+            {/* Progress Bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-emerald-100 mb-1">
+                <span>Progress</span>
+                <span>5/20 (25%)</span>
+              </div>
+              <div className="w-full bg-emerald-800/40 rounded-full h-2">
+                <div className="bg-gradient-to-r from-white to-emerald-100 h-2 rounded-full transition-all duration-300" style={{width: '25%'}}></div>
+              </div>
+            </div>
+
+            {/* Tier Info */}
+            <div className="flex items-center justify-center">
+              <div className="text-xs">
+                <span className="text-emerald-100 font-medium">Current Tier: </span>
+                <span className="bg-white text-emerald-600 px-2 py-1 rounded-full text-xs font-medium">Free</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-          <div className="text-3xl font-bold text-blue-600 mb-2">12 of 50</div>
-          <div className="text-gray-600 font-medium">Total SavIts</div>
-          <div className="text-sm text-gray-500 mt-1">Free Tier Limit</div>
+
+        {/* SavIts Module */}
+        <div className="bg-purple-600 border border-purple-200 rounded-xl p-6 relative overflow-hidden" style={{
+          backgroundImage: `
+            linear-gradient(rgba(139, 92, 246, 0.8), rgba(109, 40, 217, 0.8)),
+            url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=")
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}>
+          <div className="absolute inset-0 bg-purple-600/70 backdrop-blur-sm"></div>
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <Archive size={24} className="text-white" />
+              <h3 className="text-2xl font-bold text-white">Total SavIts</h3>
+            </div>
+            <div className="text-4xl font-bold text-white mb-3">12 <span className="text-lg text-purple-200">used</span></div>
+            
+            {/* Progress Bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-purple-100 mb-1">
+                <span>Progress</span>
+                <span>12/50 (24%)</span>
+              </div>
+              <div className="w-full bg-purple-800/40 rounded-full h-2">
+                <div className="bg-gradient-to-r from-white to-purple-100 h-2 rounded-full transition-all duration-300" style={{width: '24%'}}></div>
+              </div>
+            </div>
+
+            {/* Tier Info */}
+            <div className="flex items-center justify-center">
+              <div className="text-xs">
+                <span className="text-purple-100 font-medium">Current Tier: </span>
+                <span className="bg-white text-purple-600 px-2 py-1 rounded-full text-xs font-medium">Free</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Recent QuickSavs Section */}
+      {/* Upgrade Section */}
+      <div className="bg-white border-2 border-gray-300 rounded-xl p-6 mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Ready to Level Up?</h3>
+            <p className="text-gray-600 text-sm">Unlock more Spaces, Stacks, and SavIts with QuickSav Pro</p>
+          </div>
+          <div>
+            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+              View Plans
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* QuickSavs Section */}
       <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Recent QuickSavs</h2>
-          <div className="flex gap-2">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Camera size={20} className="text-gray-600" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Upload size={20} className="text-gray-600" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Link size={20} className="text-gray-600" />
-            </button>
+        {/* QuickSavs Header with Stats */}
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-6 mb-6 relative overflow-hidden" style={{
+          backgroundImage: `
+            url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Ccircle cx='30' cy='10' r='2'/%3E%3Ccircle cx='10' cy='30' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E"),
+            linear-gradient(135deg, #F59E0B 0%, #DC2626 100%)
+          `
+        }}>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Clock size={28} className="text-white" />
+                <h2 className="text-3xl font-bold text-white">QuickSavs</h2>
+              </div>
+              <div className="text-xs">
+                <span className="text-orange-100 font-medium">Current Tier: </span>
+                <span className="bg-white text-orange-600 px-2 py-1 rounded-full text-xs font-medium">Free</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <div className="text-3xl font-bold text-white mb-2">{quickSavs.length} <span className="text-lg text-orange-200">total</span></div>
+                <div className="text-sm text-orange-100">Unorganized items</div>
+              </div>
+              <div>
+                <div className="mb-2">
+                  <div className="flex justify-between text-xs text-orange-100 mb-1">
+                    <span>Storage Used</span>
+                    <span>{quickSavs.length}/100 (10%)</span>
+                  </div>
+                  <div className="w-full bg-orange-800/40 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-white to-orange-100 h-2 rounded-full transition-all duration-300" style={{width: '10%'}}></div>
+                  </div>
+                </div>
+                <button className="text-xs bg-white hover:bg-orange-50 text-orange-600 px-3 py-1 rounded-full transition-colors font-medium">
+                  Upgrade
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -323,7 +726,7 @@ function App() {
 
         {/* QuickSavs List */}
         <div className="space-y-3">
-          {quickSavs.map(quickSav => {
+          {quickSavs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(quickSav => {
             const fileTypeInfo = getFileTypeIcon(quickSav);
             
             return (
@@ -351,18 +754,52 @@ function App() {
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-          <div className="text-sm text-gray-500">
-            Showing 3 of 12 QuickSavs
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-500">
+              Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, quickSavs.length)} of {quickSavs.length} QuickSavs
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">Show:</span>
+              <select 
+                value={itemsPerPage} 
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="border border-gray-300 rounded px-2 py-1 text-sm"
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Previous
             </button>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">1</button>
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors">
-              2
-            </button>
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors">
+            {Array.from({ length: Math.ceil(quickSavs.length / itemsPerPage) }, (_, i) => i + 1).map(page => (
+              <button 
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 rounded text-sm transition-colors ${
+                  currentPage === page 
+                    ? 'bg-blue-600 text-white' 
+                    : 'border border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(quickSavs.length / itemsPerPage), prev + 1))}
+              disabled={currentPage === Math.ceil(quickSavs.length / itemsPerPage)}
+              className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Next
             </button>
           </div>
@@ -469,7 +906,10 @@ function App() {
       
       {/* QuickSav NOW Button */}
       <div className="p-4 border-b border-gray-200">
-        <button className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+        <button 
+          onClick={() => setShowQuickSavModal(true)}
+          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
           QuickSav NOW
         </button>
       </div>
@@ -578,6 +1018,9 @@ function App() {
           {renderView()}
         </main>
       </div>
+
+      {/* QuickSav NOW Modal */}
+      <QuickSavModal />
     </div>
   );
 }
