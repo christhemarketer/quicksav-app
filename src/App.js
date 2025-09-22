@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import QuickSavForm from './components/QuickSavForm';
+import EnhancedDashboard from './components/EnhancedDashboard';
 
 // Supabase setup
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
@@ -108,7 +109,7 @@ function App() {
         {/* Main Content */}
         <main className="flex-1 min-h-screen">
           {currentView === 'dashboard' && (
-            <Dashboard 
+            <EnhancedDashboard 
               user={user} 
               isDarkMode={isDarkMode} 
               quickSavs={quickSavs}
@@ -218,9 +219,9 @@ const Sidebar = ({ currentView, setCurrentView, isDarkMode, setIsDarkMode, onSig
     {/* QuickSav NOW Button */}
     <button
       onClick={onQuickSav}
-      className="w-full p-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 mb-6 font-medium"
+      className="w-full p-3 rounded-lg bg-red-600 text-white hover:bg-red-700 flex items-center gap-2 mb-6 font-medium"
     >
-      <span className="text-lg">+</span> QuickSav NOW
+      QuickSav NOW
     </button>
     
     {/* Navigation */}
@@ -231,7 +232,7 @@ const Sidebar = ({ currentView, setCurrentView, isDarkMode, setIsDarkMode, onSig
           currentView === 'dashboard' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
         }`}
       >
-        <span>Dashboard</span>
+        <span>Home</span>
         {quickSavsCount > 0 && (
           <span className={`text-xs px-2 py-1 rounded-full ${
             currentView === 'dashboard' ? 'bg-blue-500' : 'bg-blue-600 text-white'
@@ -248,120 +249,38 @@ const Sidebar = ({ currentView, setCurrentView, isDarkMode, setIsDarkMode, onSig
       >
         Spaces
       </button>
+      <button
+        onClick={() => setCurrentView('sendit')}
+        className={`w-full text-left p-3 rounded-lg ${
+          currentView === 'sendit' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+        }`}
+      >
+        SendIt
+      </button>
     </nav>
 
-    {/* Bottom Actions */}
-    <div className="mt-8 pt-8 border-t border-gray-200">
-      <button
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        className={`w-full p-3 rounded-lg mb-2 text-left ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`}
-      >
-        {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-      </button>
-      <button
-        onClick={onSignOut}
-        className="w-full p-3 rounded-lg text-left text-red-600 hover:bg-red-50"
-      >
-        Sign Out
-      </button>
-    </div>
-  </div>
-);
-
-// Dashboard component
-const Dashboard = ({ user, isDarkMode, quickSavs, onQuickSav }) => (
-  <div className="p-6">
-    <div className="flex items-center justify-between mb-6">
-      <div>
-        <h1 className={`text-3xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-          Welcome back, {user.email.split('@')[0]}!
-        </h1>
-        <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          Ready to save something new?
-        </p>
+    {/* Account Section */}
+    <div className="mt-8 pt-4 border-t border-gray-200">
+      <div className={`text-xs font-medium mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+        ACCOUNT
       </div>
-      <button
-        onClick={onQuickSav}
-        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
-      >
-        <span className="text-lg">+</span>
-        QuickSav NOW
-      </button>
-    </div>
-    
-    {/* Stats */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-          {quickSavs.length}
-        </div>
-        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          Total QuickSavs
-        </div>
-      </div>
-      <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-          0
-        </div>
-        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          Organized Items
-        </div>
-      </div>
-      <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-          0
-        </div>
-        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          Spaces Created
-        </div>
-      </div>
-    </div>
-
-    {/* Recent QuickSavs */}
-    <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-      <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-        Recent QuickSavs
-      </h2>
-      
-      {quickSavs.length === 0 ? (
-        <div className="text-center py-8">
-          <div className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-            No QuickSavs yet
-          </div>
-          <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-4`}>
-            Start saving content with the QuickSav NOW button
-          </p>
-          <button
-            onClick={onQuickSav}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Create Your First QuickSav
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {quickSavs.slice(0, 5).map((quickSav) => (
-            <div
-              key={quickSav.id}
-              className={`p-3 rounded-lg border ${isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-gray-50'}`}
-            >
-              <div className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                {quickSav.title}
-              </div>
-              <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {quickSav.content_type} • {new Date(quickSav.created_at).toLocaleDateString()}
-              </div>
-            </div>
-          ))}
-          {quickSavs.length > 5 && (
-            <div className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              And {quickSavs.length - 5} more...
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-export default App;
+      <nav className="space-y-1">
+        <button
+          onClick={() => setCurrentView('profile')}
+          className={`w-full text-left p-2 rounded text-sm ${
+            currentView === 'profile' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          Profile
+        </button>
+        <button
+          onClick={() => setCurrentView('settings')}
+          className={`w-full text-left p-2 rounded text-sm ${
+            currentView === 'settings' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          Settings
+        </button>
+        <button
+          onClick={onSignOut}
+          className="w-full text-left p-2 rounded text-sm text-red-600 hover:bg-red-50"
