@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X, Link, FileText, Image, Video, Mic, Upload, Plus } from 'lucide-react';
 
 const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
   const [contentType, setContentType] = useState('link');
@@ -7,19 +6,15 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
   const [url, setUrl] = useState('');
   const [textContent, setTextContent] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState(null);
-  const [recordingTime, setRecordingTime] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // Content type options
   const contentTypes = [
-    { id: 'link', label: 'Link', icon: Link, color: 'blue' },
-    { id: 'text', label: 'Text Note', icon: FileText, color: 'green' },
-    { id: 'image', label: 'Image', icon: Image, color: 'purple' },
-    { id: 'video', label: 'Video', icon: Video, color: 'red' },
-    { id: 'voice', label: 'Voice Note', icon: Mic, color: 'orange' },
-    { id: 'file', label: 'Document', icon: Upload, color: 'gray' }
+    { id: 'link', label: 'Link' },
+    { id: 'text', label: 'Text Note' },
+    { id: 'image', label: 'Image' },
+    { id: 'video', label: 'Video' },
+    { id: 'file', label: 'Document' }
   ];
 
   // Reset form
@@ -29,9 +24,6 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
     setUrl('');
     setTextContent('');
     setSelectedFile(null);
-    setAudioBlob(null);
-    setRecordingTime(0);
-    setIsRecording(false);
   };
 
   // Handle file selection
@@ -45,52 +37,6 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
     }
   };
 
-  // Voice recording functions
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const chunks = [];
-
-      recorder.ondataavailable = (e) => chunks.push(e.data);
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' });
-        setAudioBlob(blob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      recorder.start();
-      setIsRecording(true);
-      setRecordingTime(0);
-
-      const timer = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-
-      // Store timer and recorder for cleanup
-      window.currentRecording = { recorder, timer };
-
-    } catch (error) {
-      alert('Could not access microphone');
-    }
-  };
-
-  const stopRecording = () => {
-    if (window.currentRecording) {
-      window.currentRecording.recorder.stop();
-      clearInterval(window.currentRecording.timer);
-      window.currentRecording = null;
-    }
-    setIsRecording(false);
-  };
-
-  // Format recording time
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   // Validate form
   const isValid = () => {
     if (!title.trim()) return false;
@@ -98,7 +44,6 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
     switch (contentType) {
       case 'link': return url.trim();
       case 'text': return textContent.trim();
-      case 'voice': return audioBlob;
       case 'image':
       case 'video':
       case 'file': return selectedFile;
@@ -120,15 +65,13 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
       text_content: contentType === 'text' ? textContent : null,
       file_name: selectedFile ? selectedFile.name : null,
       file_size: selectedFile ? selectedFile.size : null,
-      audio_duration: contentType === 'voice' ? recordingTime : null,
       metadata: {
-        originalFile: selectedFile ? selectedFile.type : null,
-        recordingDuration: contentType === 'voice' ? recordingTime : null
+        originalFile: selectedFile ? selectedFile.type : null
       }
     };
 
     try {
-      await onSave(quickSavData, selectedFile, audioBlob);
+      await onSave(quickSavData, selectedFile, null);
       resetForm();
       onClose();
     } catch (error) {
@@ -154,7 +97,7 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
               onClick={onClose}
               className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
             >
-              <X size={20} className={isDarkMode ? 'text-gray-300' : 'text-gray-600'} />
+              ✕
             </button>
           </div>
           <p className={`mt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -169,39 +112,35 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
               Content Type
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {contentTypes.map((type) => {
-                const IconComponent = type.icon;
-                return (
-                  <button
-                    key={type.id}
-                    type="button"
-                    onClick={() => setContentType(type.id)}
-                    className={`p-4 rounded-lg border-2 transition-colors ${
-                      contentType === type.id
-                        ? `border-${type.color}-500 bg-${type.color}-50`
-                        : isDarkMode
-                          ? 'border-gray-600 hover:border-gray-500 bg-gray-700'
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
-                    }`}
-                  >
-                    <IconComponent 
-                      size={24} 
-                      className={`mx-auto mb-2 ${
-                        contentType === type.id 
-                          ? `text-${type.color}-600` 
-                          : isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                      }`} 
-                    />
-                    <div className={`text-sm font-medium ${
-                      contentType === type.id 
-                        ? `text-${type.color}-600` 
-                        : isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
-                      {type.label}
-                    </div>
-                  </button>
-                );
-              })}
+              {contentTypes.map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  onClick={() => setContentType(type.id)}
+                  className={`p-4 rounded-lg border-2 transition-colors ${
+                    contentType === type.id
+                      ? 'border-blue-500 bg-blue-50'
+                      : isDarkMode
+                        ? 'border-gray-600 hover:border-gray-500 bg-gray-700'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                  }`}
+                >
+                  <div className={`text-2xl mb-2`}>
+                    {type.id === 'link' && '🔗'}
+                    {type.id === 'text' && '📝'}
+                    {type.id === 'image' && '🖼️'}
+                    {type.id === 'video' && '🎥'}
+                    {type.id === 'file' && '📄'}
+                  </div>
+                  <div className={`text-sm font-medium ${
+                    contentType === type.id 
+                      ? 'text-blue-600' 
+                      : isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    {type.label}
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -261,66 +200,6 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
               </div>
             )}
 
-            {contentType === 'voice' && (
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Voice Recording
-                </label>
-                <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                  isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-gray-50'
-                }`}>
-                  {!audioBlob ? (
-                    <div>
-                      <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                        isRecording ? 'bg-red-500 animate-pulse' : 'bg-orange-500'
-                      }`}>
-                        <Mic size={24} className="text-white" />
-                      </div>
-                      <div className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {formatTime(recordingTime)}
-                      </div>
-                      <div className="space-x-2">
-                        {!isRecording ? (
-                          <button
-                            type="button"
-                            onClick={startRecording}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                          >
-                            Start Recording
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={stopRecording}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                          >
-                            Stop Recording
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="flex items-center justify-center mb-3">
-                        <Mic size={20} className="text-orange-600 mr-2" />
-                        <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>
-                          Recording Complete ({formatTime(recordingTime)})
-                        </span>
-                      </div>
-                      <audio controls src={URL.createObjectURL(audioBlob)} className="mx-auto" />
-                      <button
-                        type="button"
-                        onClick={() => setAudioBlob(null)}
-                        className="mt-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
-                      >
-                        Delete & Re-record
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             {(contentType === 'image' || contentType === 'video' || contentType === 'file') && (
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -342,9 +221,9 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
                       <button
                         type="button"
                         onClick={() => setSelectedFile(null)}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 text-xl"
                       >
-                        <X size={20} />
+                        ✕
                       </button>
                     </div>
                   </div>
@@ -352,7 +231,7 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
                   <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
                     isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-gray-50'
                   }`}>
-                    <Upload size={32} className={`mx-auto mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-400'}`} />
+                    <div className="text-4xl mb-3">📁</div>
                     <input
                       type="file"
                       onChange={handleFileSelect}
@@ -366,7 +245,7 @@ const QuickSavForm = ({ isOpen, onClose, onSave, isDarkMode }) => {
                     />
                     <label
                       htmlFor="file-upload"
-                      className="cursor-pointer text-blue-600 hover:text-blue-700"
+                      className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium"
                     >
                       Click to browse files
                     </label>
