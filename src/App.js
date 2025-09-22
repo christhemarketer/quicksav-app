@@ -284,3 +284,22 @@ const Sidebar = ({ currentView, setCurrentView, isDarkMode, setIsDarkMode, onSig
         <button
           onClick={onSignOut}
           className="w-full text-left p-2 rounded text-sm text-red-600 hover:bg-red-50"
+        >
+          Sign Out
+        </button>
+      </nav>
+    </div>
+
+    {/* Dark Mode Toggle */}
+    <div className="mt-4 pt-4 border-t border-gray-200">
+      <button
+        onClick={() => setIsDarkMode(!isDarkMode)}
+        className={`w-full p-2 rounded text-sm text-left ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`}
+      >
+        {isDarkMode ? 'Light' : 'Dark'}
+      </button>
+    </div>
+  </div>
+);
+
+export default App;
