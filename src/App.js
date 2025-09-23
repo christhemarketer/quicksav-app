@@ -206,98 +206,139 @@ const LoginForm = ({ onSignIn, onSignUp }) => {
   );
 };
 
-// Sidebar component
+// Updated Sidebar component to match the design
 const Sidebar = ({ currentView, setCurrentView, isDarkMode, setIsDarkMode, onSignOut, onQuickSav, user, quickSavsCount }) => (
-  <div className={`w-64 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg p-4`}>
-    <div className="mb-8">
-      <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>QuickSav</h2>
-      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-        {user?.email?.split('@')[0] || 'User'}
-      </p>
+  <div className="w-64 bg-white h-screen flex flex-col shadow-lg">
+    {/* Header */}
+    <div className="p-6 pb-4">
+      <h1 className="text-2xl font-bold text-gray-900">QuickSav</h1>
     </div>
     
     {/* QuickSav NOW Button */}
-    <button
-      onClick={onQuickSav}
-      className="w-full p-3 rounded-lg bg-red-600 text-white hover:bg-red-700 flex items-center gap-2 mb-6 font-medium"
-    >
-      QuickSav NOW
-    </button>
+    <div className="px-4 pb-4">
+      <button
+        onClick={onQuickSav}
+        className="w-full py-3 px-4 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors font-semibold text-base"
+      >
+        QuickSav NOW
+      </button>
+    </div>
     
-    {/* Navigation */}
-    <nav className="space-y-2">
+    {/* Main Navigation */}
+    <nav className="flex-1 px-4">
       <button
         onClick={() => setCurrentView('dashboard')}
-        className={`w-full text-left p-3 rounded-lg flex items-center justify-between ${
-          currentView === 'dashboard' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+        className={`w-full text-left py-3 px-4 rounded-lg flex items-center gap-3 transition-colors ${
+          currentView === 'dashboard' 
+            ? 'bg-blue-50 text-blue-600' 
+            : 'text-gray-700 hover:bg-gray-50'
         }`}
       >
-        <span>Home</span>
-        {quickSavsCount > 0 && (
-          <span className={`text-xs px-2 py-1 rounded-full ${
-            currentView === 'dashboard' ? 'bg-blue-500' : 'bg-blue-600 text-white'
-          }`}>
-            {quickSavsCount}
-          </span>
-        )}
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span className="font-medium">Home</span>
       </button>
+      
       <button
         onClick={() => setCurrentView('spaces')}
-        className={`w-full text-left p-3 rounded-lg ${
-          currentView === 'spaces' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+        className={`w-full text-left py-3 px-4 rounded-lg flex items-center gap-3 transition-colors mt-1 ${
+          currentView === 'spaces' 
+            ? 'bg-blue-50 text-blue-600' 
+            : 'text-gray-700 hover:bg-gray-50'
         }`}
       >
-        Spaces
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <span className="font-medium">Spaces</span>
       </button>
+      
       <button
         onClick={() => setCurrentView('sendit')}
-        className={`w-full text-left p-3 rounded-lg ${
-          currentView === 'sendit' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+        className={`w-full text-left py-3 px-4 rounded-lg flex items-center gap-3 transition-colors mt-1 ${
+          currentView === 'sendit' 
+            ? 'bg-blue-50 text-blue-600' 
+            : 'text-gray-700 hover:bg-gray-50'
         }`}
       >
-        SendIt
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+        </svg>
+        <span className="font-medium">SendIt</span>
       </button>
-    </nav>
-
-    {/* Account Section */}
-    <div className="mt-8 pt-4 border-t border-gray-200">
-      <div className={`text-xs font-medium mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-        ACCOUNT
-      </div>
-      <nav className="space-y-1">
+      
+      {/* Account Section */}
+      <div className="mt-8 pt-4">
+        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-4">
+          Account
+        </div>
+        
         <button
           onClick={() => setCurrentView('profile')}
-          className={`w-full text-left p-2 rounded text-sm ${
-            currentView === 'profile' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+          className={`w-full text-left py-3 px-4 rounded-lg flex items-center gap-3 transition-colors ${
+            currentView === 'profile' 
+              ? 'bg-blue-50 text-blue-600' 
+              : 'text-gray-700 hover:bg-gray-50'
           }`}
         >
-          Profile
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span className="font-medium">Profile</span>
         </button>
+        
         <button
           onClick={() => setCurrentView('settings')}
-          className={`w-full text-left p-2 rounded text-sm ${
-            currentView === 'settings' ? 'bg-blue-600 text-white' : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+          className={`w-full text-left py-3 px-4 rounded-lg flex items-center gap-3 transition-colors mt-1 ${
+            currentView === 'settings' 
+              ? 'bg-blue-50 text-blue-600' 
+              : 'text-gray-700 hover:bg-gray-50'
           }`}
         >
-          Settings
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span className="font-medium">Settings</span>
         </button>
+        
         <button
           onClick={onSignOut}
-          className="w-full text-left p-2 rounded text-sm text-red-600 hover:bg-red-50"
+          className="w-full text-left py-3 px-4 rounded-lg flex items-center gap-3 transition-colors mt-1 text-gray-700 hover:bg-gray-50"
         >
-          Sign Out
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span className="font-medium">Sign Out</span>
         </button>
-      </nav>
-    </div>
+      </div>
+    </nav>
 
-    {/* Dark Mode Toggle */}
-    <div className="mt-4 pt-4 border-t border-gray-200">
-      <button
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        className={`w-full p-2 rounded text-sm text-left ${isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`}
-      >
-        {isDarkMode ? 'Light' : 'Dark'}
-      </button>
+    {/* Dark Mode Toggle at Bottom */}
+    <div className="p-4 border-t border-gray-200">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span className="text-sm font-medium text-gray-700">Light</span>
+        </div>
+        
+        <button
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 bg-gray-200"
+        >
+          <span className={`${isDarkMode ? 'translate-x-6' : 'translate-x-1'} inline-block w-4 h-4 transform bg-white rounded-full transition-transform`} />
+        </button>
+        
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Dark</span>
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </div>
+      </div>
     </div>
   </div>
 );
